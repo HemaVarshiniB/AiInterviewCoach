@@ -4,7 +4,7 @@ from aiHelper import fetch_interview_rounds, generate_question, evaluate_respons
 st.title("AI Interview Coach")
 
 # Get user input
-candidate_name = st.text_input("Enter your name:")
+# candidate_name = st.text_input("Enter your name:")
 company = st.text_input("Enter the company you're applying to:")
 role = st.text_input("Enter the role you're applying for:")
 experience = st.slider("Years of experience:", 0, 20, 2)
