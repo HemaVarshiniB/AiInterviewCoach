@@ -1,5 +1,6 @@
 import ollama
 import json
+import re
 
 
 def fetch_interview_rounds(company, role):
@@ -67,11 +68,18 @@ def evaluate_response(question, user_response):
     prompt = f"Evaluate the following response for the question: '{question}'\nResponse: '{user_response}'\nGive a score out of 10 and provide feedback."
 
     # Call Ollama LLM (adjust model as needed)
-    response = ollama.chat(model="mistral", messages=[{"role": "user", "content": prompt}])
+    response = ollama.chat(model="gemma:2b", messages=[{"role": "user", "content": prompt}])
     evaluation = response['message']['content']
 
-    # Extract score and feedback (assuming LLM returns structured response)
-    score = int(evaluation.split("Score:")[1].split("\n")[0].strip()) if "Score:" in evaluation else 5
+    # Extract score using regex to handle potential score format issues
+    score_match = re.search(r"Score:\s*(\d+(\.\d+)?)", evaluation)  # Regex to capture score (integer or float)
+    if score_match:
+        score = float(score_match.group(1))  # Convert to float first
+        score = int(score)  # Convert to integer
+    else:
+        score = 5  # Default fallback score if not found
+
+    # Extract feedback (assuming 'Feedback:' keyword is present in the response)
     feedback = evaluation.split("Feedback:")[1].strip() if "Feedback:" in evaluation else evaluation
 
     return score, feedback
