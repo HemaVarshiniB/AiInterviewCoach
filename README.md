@@ -4,5 +4,6 @@ Purpose: The AI Interview Coach project aims to assist job seekers, particularly
 
 *Installation & Launching:*
 1. Setup Virtual env => to activate it follow this cmd => *.venv\Scripts\activate* (for windows)
-2. Install necessary libraries through pip. (ollama, gemma:2b, mistral, whisper, streamlit, sqlite3)
-3. Launch application with this cmd => streamlit run app.py
+2. Install necessary libraries through pip. (ollama, gemma:2b, streamlit, sqlite3)
+3. Launch application with this cmd => *streamlit run app.py*
+4. To create sqlite3 db and insert records in db, go to interviewStages.py path and run cmd => *streamlit run interviewStages.py*. This will create db and tables in it.
