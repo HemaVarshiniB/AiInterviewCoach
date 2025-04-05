@@ -187,6 +187,19 @@ if "rounds" in st.session_state and st.session_state["rounds"]:
         if st.session_state["submitted"]:
             score, feedback = evaluate_response(question, st.session_state["saved_answer"])
 
+            # Save to round_performance table
+            conn = sqlite3.connect("./database/interview.db")
+            cursor = conn.cursor()
+
+            cursor.execute("""
+                INSERT INTO interview_questions (round_id, question_text, user_response, question_category, question_score, question_feedback)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (round_id, question, st.session_state["saved_answer"], round_type, score, feedback))
+
+            conn.commit()
+            conn.close()
+
             st.session_state["feedback_shown"] = True
             st.session_state["score"] = score
             st.session_state["feedback"] = feedback
@@ -195,18 +208,6 @@ if "rounds" in st.session_state and st.session_state["rounds"]:
             st.info(f"Feedback: {feedback}")
             # Reset submitted state so that the user can submit again for the next question
             st.session_state["submitted"] = False
-
-            # Save to round_performance table
-            conn = sqlite3.connect("./database/interview.db")
-            cursor = conn.cursor()
-
-            cursor.execute("""
-                    INSERT INTO interview_questions (round_id, question_text, question_category, question_score, question_feedback)
-                    VALUES (?, ?, ?, ?, ?)
-                """, (round_id, question, round_type, score, feedback))
-
-            conn.commit()
-            conn.close()
 
             st.rerun()
 

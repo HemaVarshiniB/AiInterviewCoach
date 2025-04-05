@@ -37,12 +37,19 @@ def init_interview_tracking_db():
             question_id INTEGER PRIMARY KEY AUTOINCREMENT,
             round_id INTEGER,
             question_text TEXT,
+            user_response TEXT,
             question_category TEXT,
             question_score REAL,
             question_feedback TEXT,
             FOREIGN KEY (round_id) REFERENCES interview_rounds(round_id)
         )
     """)
+
+    # Add 'user_response' column to interview_questions if it doesn't exist
+    # cursor.execute("PRAGMA table_info(interview_questions)")
+    # columns = [column[1] for column in cursor.fetchall()]
+    # if "user_response" not in columns:
+    #     cursor.execute("ALTER TABLE interview_questions ADD COLUMN user_response TEXT")
 
     conn.commit()
     conn.close()
