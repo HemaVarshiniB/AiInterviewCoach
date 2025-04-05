@@ -41,18 +41,18 @@ def init_db():
 
     # Sample round durations
     round_durations = [
-        ("Coding", 30),
-        ("System Design", 45),
-        ("Behavioral", 30),
-        ("ML Concepts", 40),
-        ("System Thinking", 40),
-        ("Leadership", 35),
-        ("Data Modeling", 40),
-        ("SQL", 30),
-        ("AI Fundamentals", 40),
-        ("Research Discussion", 45),
-        ("Architecture Review", 50),
-        ("Embedded Systems", 40),
+        ("Coding", 3),
+        ("System Design", 3),
+        ("Behavioral", 3),
+        ("ML Concepts", 3),
+        ("System Thinking", 3),
+        ("Leadership", 3),
+        ("Data Modeling", 3),
+        ("SQL", 3),
+        ("AI Fundamentals", 3),
+        ("Research Discussion", 3),
+        ("Architecture Review", 3),
+        ("Embedded Systems", 3),
     ]
 
     # Insert sample interview data
