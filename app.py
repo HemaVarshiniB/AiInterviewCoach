@@ -4,6 +4,8 @@ import streamlit as st
 import sqlite3
 
 from utils.aiHelper import fetch_interview_rounds, generate_question, evaluate_response
+from utils.audioHelper import speak_text, record_audio, speech_to_text
+import os
 
 st.title("AI Interview Coach")
 
@@ -48,6 +50,21 @@ def get_round_duration(round_type):
     result = cursor.fetchone()
     conn.close()
     return result[0] if result else 10  # default 10 minutes
+
+def ensure_round_id_initialized():
+    current = st.session_state["current_round"]
+    if current < len(st.session_state["rounds"]) and len(st.session_state["round_ids"]) <= current:
+        conn = sqlite3.connect("./database/interview.db")
+        cursor = conn.cursor()
+        round_type = st.session_state["rounds"][current]
+        cursor.execute("""
+            INSERT INTO round_performance (session_id, user_id, round_type)
+            VALUES (?, ?, ?)
+        """, (st.session_state["session_id"], st.session_state["user_id"], round_type))
+        conn.commit()
+        round_id = cursor.lastrowid
+        st.session_state["round_ids"].append(round_id)
+        conn.close()
 
 
 # User selects company, experience level, and role
@@ -161,6 +178,7 @@ if "rounds" in st.session_state and st.session_state["rounds"]:
             st.session_state["feedback_shown"] = False
             st.session_state["round_scores"] = []
             st.session_state["new_round"] = True
+            ensure_round_id_initialized()
 
             if st.session_state["current_round"] >= len(st.session_state["rounds"]):
                 st.balloons()
@@ -172,8 +190,27 @@ if "rounds" in st.session_state and st.session_state["rounds"]:
 
         # If there's time left, continue with the interview question
         question = generate_question(role, experience, company, round_type)
+
+        audio_file = speak_text(question)
+        st.audio(audio_file, format="audio/mp3")
+
         st.write("**Question:**", question)
-        user_answer = st.text_area("Your Answer:", key='user_answer')
+
+        # Optionally allow user to speak their answer
+        if st.button("🎙️ Record My Answer (10 sec)"):
+            audio_path = record_audio(duration=10)
+            try:
+                spoken_text = speech_to_text(audio_path)
+                st.session_state["user_answer"] = spoken_text
+                st.success("Your answer was transcribed below:")
+                st.text_area("Your Answer:", value=spoken_text, key='user_answer')
+            except NotImplementedError as e:
+                st.error(str(e))
+                st.text_area("Your Answer:", key='user_answer')
+        else:
+            st.text_area("Your Answer:", key='user_answer')
+
+        # user_answer = st.text_area("Your Answer:", key='user_answer')
 
         if "submitted" not in st.session_state:
             st.session_state["submitted"] = False
